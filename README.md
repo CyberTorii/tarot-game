@@ -1,10 +1,12 @@
 # Tarot Game Roadmap
 
-Last Fix (24/03/2024):
-- [X] Excuse issue if fold win but winner don't have excuse
+Last Update (08/07/2024)
+- [X] Show who takes what
+- [X] Reduce card sizes
+- [X] Show last fold
 
-Last Update (17/03/2024):
-- [X] Rule can't play at first turn, color taken
+Last Fix (08/07/2024)
+- [X] Block joiner during a game
 
 Update:
 - [X] Add nicknames
@@ -17,6 +19,7 @@ Update:
 - [X] Know who plays what
 - [X] Show who took
 - [X] Your turn sound
+- [X] Rule can't play at first turn, color taken
 
 Fix:
 - [X] Excuse not counted (for oudlersNb)
@@ -30,14 +33,12 @@ Fix:
 - [X] Partner score not take in account
 - [X] Excuse issue if fold lose
 - [X] Issue if first color is Excuse
+- [X] Excuse issue if fold win but winner don't have excuse
 
 In progress:
-- [ ] Spectator mode
 - [ ] Take small, guard
-- [ ] Show who takes what
-- [ ] "Join current game" button in maintenance
+- [ ] Possibility to rejoin game if disconnected
 - [ ] Highlight valid cards
-- [ ] Show last fold
 - [ ] Change beginner after each game
 
 # Getting Started with Create React App
@@ -72,6 +73,10 @@ Your app is ready to be deployed!
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ### `npm run eject`
+
+In the project directory, you can run:
+
+### `node server.js`
 
 **Note: this is a one-way operation. Once you `eject`, you can't go back!**
 

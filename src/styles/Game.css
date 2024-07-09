@@ -9,14 +9,15 @@ body {
 
 .menu-container {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1%;
     padding: 1%;
-    height: 5vh;
+    height: 10vh;
 }
 
 .menu-container p {
     color: white;
+    margin: 0.596vh 0;
 }
 
 button {
@@ -99,12 +100,12 @@ input[type=text]:disabled {
 /* ---------- GAME & DECK ---------- */
 
 .game-container {
-    height: 50vh;
+    height: 45vh;
     margin-bottom: 1%;
 }
 
 .deck-container {
-    height: 20vh;
+    height: fit-content;
 }
 
 .deck-container, .game-container {
@@ -177,4 +178,24 @@ input[type=text]:disabled {
 
 .popup-content p {
     margin: 16px 0 16px 0;
+}
+
+.last-fold-container {
+    display: flex;
+    gap: 0.8vh;
+    height: 100%;
+    margin-left: auto;
+}
+
+.last-fold-container img {
+    height: 100%;
+    aspect-ratio: 1 / 1.73;
+    border-radius: 0.5dvh;
+    margin: 0;
+}
+
+.last-fold-container img:hover {
+    transform-origin: top right;
+    transition-delay: 0.2s;
+    transform: scale(2.5);
 }

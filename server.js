@@ -17,15 +17,16 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 
 const MIN_PLAYERS = 3;
 const MAX_PLAYERS = 5;
 
 const clients = [];
+let isGameStart = false;
 
 io.on("connection", (socket) => {
-    if (clients.length < MAX_PLAYERS) {
+    if (!isGameStart && clients.length < MAX_PLAYERS) {
         const pseudo = socket.handshake.query.pseudo;
         
         clients.push({ id: socket.id, socket: socket, pseudo: pseudo, deckIndex: null });
@@ -50,9 +51,12 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         const index = clients.findIndex(client => client.id === socket.id);
         if (index !== -1) { clients.splice(index, 1); }
-        io.emit("players", clients.map(client => client.id));
+        io.emit("setPlayers", clients.map(client => ({ id: client.id, pseudo: client.pseudo })));
         // console.log("Client disconnected");
         socket.removeAllListeners();
+        if (clients.length === 0) {
+            isGameStart = false;
+        }
     });
 });
 
@@ -60,6 +64,7 @@ const game = new Gameplay(MIN_PLAYERS);
 
 function playGame(socket) {
     if (clients.length >= MIN_PLAYERS && clients.length <= MAX_PLAYERS) {
+        isGameStart = true;
         game.reset(clients.length);
         clients.forEach(client => client.deckIndex = null);
         
@@ -113,7 +118,7 @@ function takeGame(socket, data) {
         client.socket.emit("setChien", game.getDeck(client.deckIndex));
     }
 
-    if (data.isTaken) { io.emit("setTakerId", socket.id); }
+    if (data.isTaken) { io.emit("setTaker", socket.id, data.king); }
     emitTurn();
 }
 
@@ -146,6 +151,7 @@ function playCard(socket, card) {
                 const isGameOver = game.isGameOver();
                 if (isGameOver !== null) {
                     io.emit("setGameOver", isGameOver);
+                    isGameStart = false;
                 }
             }
         }

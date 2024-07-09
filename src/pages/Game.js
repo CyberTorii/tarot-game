@@ -5,14 +5,15 @@ import TakeOrPassMenu from '../components/TakeOrPassMenu';
 import PlayerCard from '../components/PlayerCards';
 import DeckCards from '../components/DeckCards';
 import FoldCards from '../components/FoldCards';
+import LastFoldCards from '../components/LastFoldCards';
 import Popup from '../components/Popup';
 import { generatePseudo } from '../logic/pseudoGenerator';
 import io from 'socket.io-client';
 import '../styles/Game.css';
 import turnSound from '../assets/sounds/turnSound.mp3';
 
-const ENDPOINT = "https://tarot-game.onrender.com";
-// const ENDPOINT = "http://localhost:5000";
+// const ENDPOINT = "https://tarot-game.onrender.com";
+const ENDPOINT = "http://localhost:5000";
 
 function Game() {
     const gamePhases = {
@@ -31,8 +32,9 @@ function Game() {
     const [deck, setDeck] = useState([]);
     const [fold, setFold] = useState({ cards: [], pseudos: [] });
     const [turnId, setTurnId] = useState('');
+    const [lastFold, setLastFold] = useState([]);
     const [gameResult, setGameResult] = useState({ winner: '', score: 0, oudlersNb: 0 });
-    const [takerId, setTakerId] = useState('');
+    const [taker, setTaker] = useState({ id: '', king: null });
     const [join, setJoin] = useState(false);
 
     const [playTurnSound] = useSound(turnSound);
@@ -68,6 +70,7 @@ function Game() {
 
     const takeOrPass = useCallback((isTaken, card) => {
         if (gamePhase === 1 && isMyTurn()) {
+            console.log("ENTER");
             socket.emit("takeOrPass", { isTaken: isTaken, king: card });
             setGamePhase(-1);
         }
@@ -101,7 +104,7 @@ function Game() {
             if (phase === 1) {
                 setFold({ cards: [], pseudos: [] });
                 setGameResult({ winner: '', score: 0, oudlersNb: 0 });
-                setTakerId('');
+                setTaker({ id: '', king: null });
             }
         });
         socket.on("setDeck", (deck) => setDeck(deck));
@@ -110,12 +113,19 @@ function Game() {
             setTurnId(turnId);
             if (turnId === myId) { playTurnSound(); }
         });
-        socket.on("setTakerId", setTakerId);
+        socket.on("setTaker", (takerId, kingCalled) => {
+            setTaker({ id: takerId, king: kingCalled});
+        });
         socket.on("setChien", (deck) => {
             setDeck(deck);
             setGamePhase(2);
         });
-        socket.on("setFold", (data) => setFold(data));
+        socket.on("setFold", (data) => {
+            setFold(data);
+            if (data.cards.length === players.length) {
+                setLastFold(data.cards);
+            }
+        });
         socket.on("setScore", (score) => updateState(setGameResult, { score: score }));
         socket.on("setGameOver", (data) => {
             setGameResult(data);
@@ -127,13 +137,13 @@ function Game() {
             socket.off("setPhase");
             socket.off("setDeck");
             socket.off("setTurnId");
-            socket.off("setTakerId");
+            socket.off("setTaker");
             socket.off("setChien");
             socket.off("setFold");
             socket.off("setScore");
             socket.off("setGameOver");
         };
-    }, [socket, myId, updateState, playTurnSound]);    
+    }, [socket, myId, updateState, playTurnSound, players.length]);    
 
     return (
         <div>
@@ -150,8 +160,9 @@ function Game() {
                     // joinGame={joinGame}
                 />
                 <TakeOrPassMenu gamePhase={gamePhase} takeOrPass={takeOrPass} />
+                <LastFoldCards fold={lastFold} /> 
             </div>
-            <PlayerCard myId={myId} players={players} turnId={turnId} takerId={takerId} />
+            <PlayerCard myId={myId} players={players} turnId={turnId} taker={taker} />
             <FoldCards fold={fold.cards} pseudos={fold.pseudos} />            
             <DeckCards deck={deck} playCard={playCard} />
             {gamePhase === 4 && <Popup gameResult={gameResult} playGame={playGame} />}
