@@ -24,6 +24,7 @@ const MAX_PLAYERS = 5;
 
 const clients = [];
 let isGameStart = false;
+let starter = 0;
 
 io.on("connection", (socket) => {
     if (!isGameStart && clients.length < MAX_PLAYERS) {
@@ -56,6 +57,7 @@ io.on("connection", (socket) => {
         socket.removeAllListeners();
         if (clients.length === 0) {
             isGameStart = false;
+            starter = 0
         }
     });
 });
@@ -68,7 +70,7 @@ function playGame(socket) {
         game.reset(clients.length);
         clients.forEach(client => client.deckIndex = null);
         
-        game.start(clients.findIndex(client => client.id === socket.id)); // Shuffle + distribute cards + initiate currentTurn
+        game.start(starter); // Shuffle + distribute cards + initiate currentTurn
         emitDecks(); // Send deck to each players
         io.emit("setPhase", 1);
         emitTurn();
@@ -152,6 +154,7 @@ function playCard(socket, card) {
                 if (isGameOver !== null) {
                     io.emit("setGameOver", isGameOver);
                     isGameStart = false;
+                    starter = (starter + 1) % clients.length;
                 }
             }
         }

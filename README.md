@@ -4,6 +4,7 @@ Last Update (08/07/2024)
 - [X] Show who takes what
 - [X] Reduce card sizes
 - [X] Show last fold
+- [X] Change beginner after each game
 
 Last Fix (08/07/2024)
 - [X] Block joiner during a game
@@ -39,7 +40,6 @@ In progress:
 - [ ] Take small, guard
 - [ ] Possibility to rejoin game if disconnected
 - [ ] Highlight valid cards
-- [ ] Change beginner after each game
 
 # Getting Started with Create React App
 

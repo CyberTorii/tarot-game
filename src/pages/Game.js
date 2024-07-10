@@ -70,7 +70,6 @@ function Game() {
 
     const takeOrPass = useCallback((isTaken, card) => {
         if (gamePhase === 1 && isMyTurn()) {
-            console.log("ENTER");
             socket.emit("takeOrPass", { isTaken: isTaken, king: card });
             setGamePhase(-1);
         }
