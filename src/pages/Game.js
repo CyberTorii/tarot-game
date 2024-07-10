@@ -83,19 +83,24 @@ function Game() {
         }
     };
 
-    useEffect(() => {
-        if (join) {
-            const newSocket = io(ENDPOINT, { 
-                autoConnect: true,
-                query: { pseudo: pseudo }
-            });
-            setSocket(newSocket);
-            return () => newSocket.disconnect();
-        }
-    }, [join, pseudo]);
+    const joinRequest = () => {
+        const newSocket = io(ENDPOINT, { 
+            autoConnect: true,
+            query: { pseudo: pseudo }
+        });
+        setSocket(newSocket);
+        return () => newSocket.disconnect();
+    }
+    
 
     useEffect(() => {
         if (!socket) return;
+        socket.on("setJoin", (join) => {
+            setJoin(join);
+            if (!join) {
+                socket.disconnect();
+            }
+        });
         socket.on("setId", setMyId); // <=> socket.on("getId", (id) => { setId(id); });
         socket.on("setPlayers", setPlayers);
         socket.on("setPhase", (phase) => {
@@ -154,7 +159,7 @@ function Game() {
                     score={gameResult.score}
                     updatePseudo={updatePseudo}
                     sendPseudo={sendPseudo}
-                    setJoin={() => {setJoin(true)}}
+                    setJoin={() => joinRequest()}
                     playGame={playGame}
                     // joinGame={joinGame}
                 />

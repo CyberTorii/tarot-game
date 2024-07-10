@@ -28,13 +28,16 @@ let starter = 0;
 
 io.on("connection", (socket) => {
     if (!isGameStart && clients.length < MAX_PLAYERS) {
+        socket.emit("setJoin", true);
         const pseudo = socket.handshake.query.pseudo;
         
         clients.push({ id: socket.id, socket: socket, pseudo: pseudo, deckIndex: null });
-        // console.log(`New client connected: ${socket.id} (${pseudo})`);
+        console.log(`New client connected: ${socket.id} (${pseudo})`);
         
         socket.emit("setId", socket.id);
         io.emit("setPlayers", clients.map(client => ({ id: client.id, pseudo: client.pseudo })));
+    } else {
+        socket.emit("setJoin", false);
     }
 
     // socket.on("ping", () => console.log(`Ping from ${socket.id}`)); // Dev ping function
@@ -53,7 +56,7 @@ io.on("connection", (socket) => {
         const index = clients.findIndex(client => client.id === socket.id);
         if (index !== -1) { clients.splice(index, 1); }
         io.emit("setPlayers", clients.map(client => ({ id: client.id, pseudo: client.pseudo })));
-        // console.log("Client disconnected");
+        console.log("Client disconnected");
         socket.removeAllListeners();
         if (clients.length === 0) {
             isGameStart = false;
